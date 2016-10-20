@@ -84,13 +84,17 @@ def network_reader(network):
 def test_from_image(network, file_name, desired_result):
     """读取一个图片文件，识别其内部文字"""
     image = PIL.Image.open(file_name)
+    image.show()
     data_bytes = list(image.getdata())
-    input_layer_activation = numpy.ndarray(data_bytes, float)
+    input_layer_activation = numpy.matrix(data_bytes, float)
     output_layer_a = network.forward_feed(input_layer_activation)
     result = output_layer_a.argmax()
+    print('network output: '+str(result))
     if result == desired_result:
+        print('identify successes!')
         return True
     else:
+        print('identify failed!')
         return False
 
 
@@ -126,7 +130,7 @@ def start_job():
     else:
         print('no previous learning result found...')
     try:
-        net.mini_batch_stochastic_gradient_descent(training_set, 300000, 100, 3.0, test_set)
+        net.mini_batch_stochastic_gradient_descent(training_set, 10, 100, 3.0, test_set)
     except KeyboardInterrupt as e:
         print('end leaning...')
         print('accuracy now: '+str(net.accuracy))
@@ -135,4 +139,10 @@ def start_job():
 if __name__ == '__main__':
     net = train_network()
     print('training end...')
-    test_from_image(net, './data/mnist_training_set/0_9.bmp', 9)
+    print('please enter the hand writing directory(absolute directory:)')
+    directory = input()
+    if directory is None:
+        directory = './data/your_test_set/1_5.bmp'
+    print('please enter the desired output:')
+    desired_output = int(input())
+    test_from_image(net, directory, desired_output)
