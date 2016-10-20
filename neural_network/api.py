@@ -87,6 +87,7 @@ def test_from_image(network, file_name, desired_result):
     image.show()
     data_bytes = list(image.getdata())
     input_layer_activation = numpy.matrix(data_bytes, float)
+    input_layer_activation /= 255
     output_layer_a = network.forward_feed(input_layer_activation)
     result = output_layer_a.argmax()
     print('network output: '+str(result))
@@ -111,6 +112,8 @@ def train_network():
         print('no previous learning result found...')
     try:
         net.mini_batch_stochastic_gradient_descent(training_set, 999999, 100, 3.0, test_set)
+        network_serializer(net)
+        return net
     except KeyboardInterrupt as e:
         print('end leaning...')
         print('accuracy now: '+str(net.accuracy))
@@ -135,14 +138,3 @@ def start_job():
         print('end leaning...')
         print('accuracy now: '+str(net.accuracy))
         network_serializer(net)
-
-if __name__ == '__main__':
-    net = train_network()
-    print('training end...')
-    print('please enter the hand writing directory(absolute directory:)')
-    directory = input()
-    if directory is None:
-        directory = './data/your_test_set/1_5.bmp'
-    print('please enter the desired output:')
-    desired_output = int(input())
-    test_from_image(net, directory, desired_output)
