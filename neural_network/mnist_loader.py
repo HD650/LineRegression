@@ -8,13 +8,13 @@ and ``load_data_wrapper``.  In practice, ``load_data_wrapper`` is the
 function usually called by our neural network code.
 """
 
-#### Libraries
 # Standard library
 import pickle
 import gzip
 
 # Third-party libraries
 import numpy as np
+
 
 def load_data():
     """Return the MNIST data as a tuple containing the training data,
@@ -42,7 +42,7 @@ def load_data():
     f = gzip.open('./data/mnist.pkl.gz', 'rb')
     training_data, validation_data, test_data = pickle.load(f, encoding='latin1')
     f.close()
-    return (training_data, validation_data, test_data)
+    return training_data, validation_data, test_data
 
 
 def vectorized_result(j):

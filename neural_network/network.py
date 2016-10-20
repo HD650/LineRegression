@@ -1,73 +1,5 @@
 import numpy
 import random
-import json
-import os
-import sys
-sys.path.append("..")
-
-
-def load_data():
-    import mnist_loader
-    training_data, validation_data, test_data = mnist_loader.load_data()
-    training_set = list()
-    for x, y in zip(training_data[0], training_data[1]):
-        training_set.append((x, mnist_loader.vectorized_result(y)))
-    test_set = list()
-    for x, y in zip(validation_data[0], validation_data[1]):
-        test_set.append((x, mnist_loader.vectorized_result(y)))
-    return training_set, test_set
-
-
-def network_serializer(network):
-    weights = list()
-    print('{0} layers in weights...'.format(len(network.weights)))
-    print('serializeing weights matrix...')
-    for layer in network.weights:
-        weight_shape = layer.shape
-        print('shape: '+str(weight_shape))
-        weights.append(layer.tolist())
-    weights = json.dumps(weights)
-
-    biases = list()
-    print('{0} layers in biases...'.format(len(network.biases)))
-    print('serializeing biases matrix...')
-    for layer in network.biases:
-        bias_shape = layer.shape
-        print('shape: '+str(bias_shape))
-        biases.append(layer.tolist())
-    biases = json.dumps(biases)
-
-    weight_file = open('./data/weights.dat', 'w')
-    bias_file = open('./data/biases.dat', 'w')
-    weight_file.write(weights)
-    bias_file.write(biases)
-    weight_file.close()
-    bias_file.close()
-
-
-def network_reader(network):
-    weight_file = open('./data/weights.dat', 'r')
-    bias_file = open('./data/biases.dat', 'r')
-    weigths_data = json.loads(weight_file.read())
-    biases_data = json.loads(bias_file.read())
-
-    weights = list()
-    print('found {0} layers in weights...'.format(len(weigths_data)))
-    for layer in weigths_data:
-        layer_m = numpy.matrix(layer)
-        weights.append(layer_m)
-
-    biases = list()
-    print('found {0} layers in biases...'.format(len(biases_data)))
-    for layer in biases_data:
-        layer_m = numpy.matrix(layer)
-        biases.append(layer_m)
-
-    network.weights = weights
-    network.biases = biases
-
-    return network
-
 # Network的training data必须是(matrix, matrix)或者(ndarray, ndarry)
 # 约定中，z为神经元的输入，a(activation)为神经元的输出，z是上一层activation关于weight加权和再加上bias，而该层activation是将该层z带入activation function所得
 # 该神经网络可以自定义activation function和cost function，两者都要提供函数本体和导数,其中cost funtion的导数要提供矩阵维度的
@@ -190,7 +122,7 @@ class Network:
             print('-'*5+'epoch '+str(i)+'-'*5)
             random.shuffle(training_data)
             training_set = training_data[:mini_batch_size]
-            biases_derivative, weights_derivative = self.update_weights_biases(training_set, learning_rate)
+            self.update_weights_biases(training_set, learning_rate)
             print('weights and biases updated!')
             if test_data is not None:
                 print('start test...')
@@ -209,20 +141,3 @@ class Network:
                 correct += 1
         print('{0} correct samples in {1}'.format(str(correct), str(test_set_len)))
         self.accuracy = float(correct/test_set_len)
-
-if __name__ == '__main__':
-    net = Network([784, 30, 10])
-    # 读取mnist的训练和测试数据
-    training_set, test_set = load_data()
-    # 如果之前有训练过的中间结果，读取之后继续训练
-    if os.path.exists('./data/weights.dat') and os.path.exists('./data/biases.dat'):
-        print('previous learning result found...')
-        net = network_reader(net)
-    else:
-        print('no previous learning result found...')
-    try:
-        net.mini_batch_stochastic_gradient_descent(training_set, 300000, 100, 3.0, test_set)
-    except KeyboardInterrupt as e:
-        print('end leaning...')
-        print('accuracy now: '+str(net.accuracy))
-        network_serializer(net)
