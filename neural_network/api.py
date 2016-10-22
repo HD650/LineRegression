@@ -53,8 +53,10 @@ def network_serializer(network):
     bias_file.close()
 
 
-def network_reader(network):
+def network_reader(network=None):
     """从磁盘中读取串行化的weights和biases数据，注意调用这个函数会完全覆盖network之前的内部字段，包括他的形状"""
+    if network is None:
+        network = Network([1, 1, 1])
     weight_file = open('./data/weights.dat', 'r')
     bias_file = open('./data/biases.dat', 'r')
     weigths_data = json.loads(weight_file.read())
@@ -65,6 +67,7 @@ def network_reader(network):
     print('found {0} layers in weights...'.format(len(weigths_data)))
     for layer in weigths_data:
         layer_m = numpy.matrix(layer)
+        print('shape: '+str(layer_m.shape))
         weights.append(layer_m)
 
     # biases同理是3维list
@@ -72,6 +75,7 @@ def network_reader(network):
     print('found {0} layers in biases...'.format(len(biases_data)))
     for layer in biases_data:
         layer_m = numpy.matrix(layer)
+        print('shape: '+str(layer_m.shape))
         biases.append(layer_m)
 
     network.layer_num = len(weights) + 1
