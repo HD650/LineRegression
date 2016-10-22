@@ -125,13 +125,13 @@ class Network:
             self.update_weights_biases(training_set, learning_rate)
             print('weights and biases updated!')
             if test_data is not None:
-                print('start test...')
                 self.evaluate(test_data)
                 print('-'*17)
                 print()
 
     def evaluate(self, test_data):
         """判断目前的神经网络的准确性"""
+        print('start test...')
         test_set_len = len(test_data)
         correct = 0
         for i, (x, y) in enumerate(test_data):
