@@ -1,14 +1,7 @@
 from api import *
 
 if __name__ == '__main__':
-    print('need training at first:')
-    is_training = input()
-    if is_training is 'true' or is_training is 'True' or is_training is '1':
-        net = train_network()
-        print('training end...')
-    else:
-        net = Network([784, 30, 10])
-        net = network_reader(net)
+    net = network_reader()
     print('start deduction...')
     print('please enter the hand writing directory(absolute directory:)')
     directory = input()
