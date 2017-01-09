@@ -31,3 +31,6 @@ CIFAR_CNN/data/reorganized_test_batch
 
 CIFAR_CNN/data/test_batch
 *.ZZK-PC-TABLE
+CIFAR_CNN/bin_data/batches.meta.txt
+*.bin
+CIFAR_CNN/bin_data/readme.html
